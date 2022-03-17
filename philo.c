@@ -19,12 +19,10 @@ static int	is_all_zero(const char *s)
 		return (0);
 }
 
-static int	chekker(int argc ,char **strn, t_th *game)
+static int	chekker(int argc ,char **strn, t_pg *game, int i)
 {
 	long	t;
-	int		i;
 
-	i = 1;
 	while (i < argc)
 	{
 		t = ft_long_atoi(strn[i]);
@@ -35,10 +33,14 @@ static int	chekker(int argc ,char **strn, t_th *game)
 			game->number_of_philosophers = (int)t;
 		else if (i == 2)
 			game->time_to_die = (int)t;
-		else if (i == 3)
+		else if (i == 3 && (int)t < game->time_to_die)
 			game->time_to_eat = (int)t;
-		else if (i == 4)
+		else if (i == 3 && (int)t >= game->time_to_die)
+			game->time_to_eat = game->time_to_die + 1;
+		else if (i == 4 && (int)t < game->time_to_die)
 			game->time_to_sleep = (int)t;
+		else if (i == 4 && (int)t >= game->time_to_die)
+			game->time_to_sleep = game->time_to_die + 1;
 		else if (i == 5)
 			game->number_of_times_each_philosopher_must_eat = (int)t;
 		i++;
@@ -46,60 +48,66 @@ static int	chekker(int argc ,char **strn, t_th *game)
 	return (0);
 }
 
-// static int what_is_hapening()
-// {
-	
-// }
+int	load_forks(t_pg *game)
+{
+	int	i;
+	int	ret;
+
+	game->forks = malloc(sizeof(pthread_mutex_t) * game->number_of_philosophers);
+	if (game->forks == NULL)
+		return (FAIL);
+	i = 0;
+	while (i < game->number_of_philosophers)
+	{
+		ret = pthread_mutex_init(&game->forks[i], NULL);
+		if (ret != 0)
+			return (FAIL);
+		i++;
+	}
+	return (0);
+}
+
+int	game_starter(t_pg *game)
+{
+	struct timeval c_time;
+	gettimeofday(&c_time, NULL);
+	game->startime = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000); // c_time.tv_usec;
+	game->number_of_times_each_philosopher_must_eat = -1;
+	game->pici = -2;
+	// game->actual = 0;
+	game->death_status = 0;
+	game->allphilo = 0;
+	game->for_timer = 128;
+	game->stopcount = 0;
+	return (0);
+}
 
 int	main(int argc, char **argv)
 {
 	int		check;
-	t_th	*game;
-	t_th	*sing;
+	t_pg	game;
 	int 	i;
 	int 	j;
-	struct timeval c_time;
 	long zero;
-
-	gettimeofday( &c_time, NULL);
-	// zero = c_time.tv_sec * 1000 + c_time.tv_usec / 1000;
 
 	if (argc == 5 || argc == 6)
 	{
-		game = malloc(sizeof(t_pg));
-		game->startime = c_time.tv_usec;
-		game->number_of_times_each_philosopher_must_eat = 0;
-		game->actual = 0;
-		check = chekker(argc, argv, game);
+		game_starter(&game);
+		check = chekker(argc, argv, &game, 1);
+		if (game.number_of_philosophers > 128)
+			game.for_timer = 512;
+		game.pici = game.number_of_times_each_philosopher_must_eat;
 		if (check != 0)
 			return (write(1 ,"Wrong input!\n", 13));
-		sing = malloc(game->number_of_philosophers * sizeof(t_th));
-		j = 0;
-		while (j < game->number_of_philosophers)
-		{
-			sing[j].game_link = game;
-			sing[j].uniqid = j;
-			j++;
-		}
-		pthread_mutex_init(&game->lock, NULL);
-		i = 0;
-		while (i < game->number_of_philosophers)
-		{
-			pthread_create(&sing[i].philo_thr, NULL, philo_run, &sing[i]);
-			i++;
-		}
+		load_forks(&game);
+		load_game(&game);
 	}
 	else
 	{
 		write(1 ,"Wrong input!\n", 13);
 		return (0);
 	}
-	i = 0;
-	while (i < game->number_of_philosophers)
-	{
-		pthread_join(sing[i].philo_thr, NULL); //later
-		i++;
-	}
+	return (0);
 }
 
 //  system("leaks push_swap");

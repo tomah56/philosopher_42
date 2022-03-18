@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/18 13:32:44 by ttokesi           #+#    #+#             */
+/*   Updated: 2022/03/18 14:03:52 by ttokesi          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 static int	is_all_zero(const char *s)
@@ -19,7 +31,7 @@ static int	is_all_zero(const char *s)
 		return (0);
 }
 
-static int	chekker(int argc ,char **strn, t_pg *game, int i)
+static int	chekker(int argc, char **strn, t_pg *game, int i)
 {
 	long	t;
 
@@ -52,12 +64,14 @@ int	load_forks(t_pg *game)
 {
 	int	i;
 	int	ret;
+	int	size;
 
-	game->forks = malloc(sizeof(pthread_mutex_t) * game->number_of_philosophers);
+	size = game->number_of_philosophers;
+	game->forks = malloc(sizeof(pthread_mutex_t) * size);
 	if (game->forks == NULL)
 		return (FAIL);
 	i = 0;
-	while (i < game->number_of_philosophers)
+	while (i < size)
 	{
 		ret = pthread_mutex_init(&game->forks[i], NULL);
 		if (ret != 0)
@@ -69,15 +83,20 @@ int	load_forks(t_pg *game)
 
 int	game_starter(t_pg *game)
 {
-	struct timeval c_time;
+	struct timeval	c_time;
+
 	gettimeofday(&c_time, NULL);
-	game->startime = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000); // c_time.tv_usec;
+	game->startime = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000);
 	game->number_of_times_each_philosopher_must_eat = -1;
 	game->pici = -2;
 	game->death_status = 0;
 	game->allphilo = 0;
-	game->for_timer = 128;
+	game->for_timer = 268;
 	game->stopcount = 0;
+	game->number_of_philosophers = 0;
+	game->time_to_die = 0;
+	game->time_to_eat = 0;
+	game->time_to_sleep = 0;
 	return (0);
 }
 
@@ -92,16 +111,14 @@ int	main(int argc, char **argv)
 		check = chekker(argc, argv, &game, 1);
 		if (game.number_of_philosophers > 128)
 			game.for_timer = 512;
-		if (game.number_of_philosophers == 1)
-			return (write(1 ,"0 1 died\n", 9));
 		game.pici = game.number_of_times_each_philosopher_must_eat;
 		if (check != 0)
-			return (write(1 ,"Wrong input!\n", 13));
+			return (write(1, "Wrong input!\n", 13));
 		load_forks(&game);
 		load_game(&game);
 	}
 	else
-		return (write(1 ,"Wrong input!\n", 13));
+		return (write(1, "Wrong input!\n", 13));
 	return (0);
 }
 

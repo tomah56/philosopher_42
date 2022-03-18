@@ -3,8 +3,8 @@ NAME = philo
 FLAGS = -Wall -Wextra -Werror
 SRC = 	ph*.c
 SRCC = 	ph_brain.c ph_long_atoi.c ph_run_game.c ph_utils.c philo.c 
-SRCO = 	ph_brain.o ph_long_atoi.o ph_run_game.o ph_utils.o philo.o 
-OBJ = $(SRC:.c=.o)
+OBJO = 	ph_brain.o ph_long_atoi.o ph_run_game.o ph_utils.o philo.o 
+OBJ = $(SRCC:.c=.o)
 
 PPP=-g -fsanitize=thread
 LLL=-g -fsanitize=address
@@ -28,12 +28,9 @@ all: $(NAME)
 	@echo $(P)"█▌     █  █▌ █▌  .▀▐█▐█▌ ▀█▄▀ "$(X)
 	@printf "\n\n"
 
+$(NAME): $(OBJO) philo.h
+	@$(CC) $(FLAGS) $(SRC) -o $(NAME)
 
-$(NAME):
-	$(CC) $(SRCC) -lpthread -c
-	$(CC) $(SRCO) -lpthread -o $(NAME).out 
-# $(NAME): $(OBJ) philo.h
-# 	$(CC) $(FLAGS) $(OBJ) -o $(NAME)
 
 clean:
 	rm -f *.o

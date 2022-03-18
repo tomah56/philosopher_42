@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ph_run_game.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/18 13:32:34 by ttokesi           #+#    #+#             */
+/*   Updated: 2022/03/18 14:07:01 by ttokesi          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 static void	status_print(t_pg *game, t_th *sing, int s_witch)
@@ -15,30 +27,28 @@ static void	status_print(t_pg *game, t_th *sing, int s_witch)
 		temp = "has taken a fork";
 	pthread_mutex_lock(&game->lock);
 	gettimeofday(&c_time, NULL);
-	sing->time_now = ((c_time.tv_usec / 1000) + (c_time.tv_sec * 1000)) - game->startime;
+	sing->time_now = ((c_time.tv_usec / 1000) + (c_time.tv_sec * 1000))
+		- game->startime;
 	if (game->death_status == 0)
 		printf("%ld %d %s\n", sing->time_now, sing->uniqid + 1, temp);
 	pthread_mutex_unlock(&game->lock);
 }
 
-static int	u_my_sleep(long time_to, int for_time)
+static void	u_my_sleep(long time_to, int for_time)
 {
 	struct timeval	c_time;
 	long			start;
-	long			now;
-	long			until;
+	long			i;
 
+	i = 0;
 	gettimeofday(&c_time, NULL);
 	start = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000);
-	now = start;
-	until = start + time_to;
-	while (now < until)
+	while (i < start + time_to)
 	{
 		usleep(for_time);
 		gettimeofday(&c_time, NULL);
-		now = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000);
+		i = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000);
 	}
-	return (0);
 }
 
 static void	feeding_sycle(t_pg *game, t_th *sing)
@@ -47,7 +57,7 @@ static void	feeding_sycle(t_pg *game, t_th *sing)
 	sing->was_eat = sing->time_now;
 	sing->count_meal++;
 	u_my_sleep(game->time_to_eat, game->for_timer);
-	if (sing->uniqid != game->number_of_philosophers)
+	if (sing->uniqid != game->number_of_philosophers - 1)
 		pthread_mutex_unlock(&game->forks[sing->uniqid + 1]);
 	else
 		pthread_mutex_unlock(&game->forks[0]);
@@ -61,20 +71,28 @@ static void	feeding_sycle(t_pg *game, t_th *sing)
 
 static void	eat_think_sleep(t_pg *game, t_th *sing)
 {
-	if (sing->uniqid != game->number_of_philosophers)
+	if (sing->uniqid != game->number_of_philosophers - 1)
 		pthread_mutex_lock(&game->forks[sing->uniqid + 1]);
-	else
+	else if (game->number_of_philosophers != 1)
+	{
 		pthread_mutex_lock(&game->forks[0]);
+	}
 	status_print(game, sing, TFORK);
-	pthread_mutex_lock(&game->forks[sing->uniqid]);
+	if (game->number_of_philosophers != 1)
+		pthread_mutex_lock(&game->forks[sing->uniqid]);
+	else
+	{
+		u_my_sleep(game->time_to_die, game->for_timer);
+		return ;
+	}
 	status_print(game, sing, TFORK);
 	feeding_sycle(game, sing);
 }
 
-void *philo_run(void *arg)
+void	*philo_run(void *arg)
 {
-	t_pg *game;
-	t_th *sing;
+	t_pg	*game;
+	t_th	*sing;
 
 	sing = (t_th *)arg;
 	game = sing->game_link;

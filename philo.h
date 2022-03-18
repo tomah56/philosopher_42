@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/18 13:32:23 by ttokesi           #+#    #+#             */
+/*   Updated: 2022/03/18 13:47:51 by ttokesi          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILO_H
 # define PHILO_H
 
@@ -18,14 +30,13 @@ enum e_nums
 	TFORK
 };
 
-
 typedef struct s_philo_game
 {
 	int				allphilo;
 	int				number_of_philosophers;
-	int				time_to_die; // they die if they dont eat this long
-	int				time_to_eat; // they hold the forks and eat this amount of time
-	int				time_to_sleep; // they sleep this amunt of time 
+	int				time_to_die;
+	int				time_to_eat;
+	int				time_to_sleep;
 	int				number_of_times_each_philosopher_must_eat;
 	int				pici;
 	int				stopcount;
@@ -33,7 +44,7 @@ typedef struct s_philo_game
 	int				death_status;
 	int				for_timer;
 	pthread_mutex_t	*forks;
-	pthread_t	watch_dog;
+	pthread_t		watch_dog;
 	pthread_mutex_t	lock;
 }	t_pg;
 
@@ -49,10 +60,7 @@ typedef struct s_singleton
 
 long	ft_long_atoi(const char *str);
 void	*philo_run(void *arg);
-
-// new life
-
-int	load_game(t_pg *game);
-int free_staff(t_th *sing);
+int		load_game(t_pg *game);
+int		free_staff(t_th *sing);
 
 #endif

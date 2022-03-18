@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ph_long_atoi.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/18 13:33:51 by ttokesi           #+#    #+#             */
+/*   Updated: 2022/03/18 13:54:52 by ttokesi          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 static int	ft_isspace(int c)
@@ -35,7 +47,7 @@ static long	create(const char *str, int n, long long int sign)
 	k = n;
 	while (str[i] != '\0' && str[i] < 58 && str[i] > 47)
 		i++;
-	if (!(str[i] < 58 && str[i] > 47 ) && str[i] != '\0')
+	if (!(str[i] < 58 && str[i] > 47) && str[i] != '\0')
 		return (0);
 	temp = 0;
 	while (i > n)
@@ -72,7 +84,7 @@ long	ft_long_atoi(const char *str)
 		sign = -1;
 		i++;
 	}
-	if (!(str[i] < 58 && str[i] > 47 ))
+	if (!(str[i] < 58 && str[i] > 47))
 		return (0);
 	return (create(str, i, sign));
 }

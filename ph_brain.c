@@ -1,20 +1,16 @@
-#include "philo.h"
-#include <pthread.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/time.h>
-#include <limits.h>
-#include <stdlib.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ph_brain.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/18 13:32:05 by ttokesi           #+#    #+#             */
+/*   Updated: 2022/03/18 14:04:52 by ttokesi          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-static int	killer_the_iii(t_th	*sing, long now, int i)
-{
-	sing[i].game_link->death_status = -3;
-	printf("%ld %d died\n", now, sing[i].uniqid + 1);
-	// usleep(2500);
-	sleep(1);
-	free_staff(sing);
-	return (1);
-}
+#include "philo.h"
 
 static int	killer_the_ii(t_th	*sing, int stop, int time_to_die, int i)
 {
@@ -28,9 +24,12 @@ static int	killer_the_ii(t_th	*sing, int stop, int time_to_die, int i)
 		gettimeofday(&c_time, NULL);
 		now = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000)
 			- sing[0].game_link->startime;
-		if (now - sing[i].was_eat >= time_to_die 
-			/* && sing[i].game_link->death_status != -5 */)
-			return (killer_the_iii(sing, now, i));
+		if (now - sing[i].was_eat >= time_to_die)
+		{
+			sing[i].game_link->death_status = -3;
+			printf("%ld %d died\n", now, sing[i].uniqid + 1);
+			return (1);
+		}
 		if (sing[i].count_meal == sing[0].game_link->pici)
 			ch_eck++;
 		i++;
@@ -52,8 +51,11 @@ static void	*the_killer(void *arg)
 	while (1)
 	{
 		if (killer_the_ii(sing, stop, time_to_die, 0))
+		{
+			free_staff(sing);
 			return (NULL);
-		usleep(1024);
+		}
+		usleep(512);
 	}
 	return (NULL);
 }
@@ -79,6 +81,26 @@ static int	load_values(t_th *sing, t_pg *game)
 	return (0);
 }
 
+static int	norm_join(t_th	*sing, t_pg *game)
+{
+	int	i;
+	int	ret;
+
+	game->allphilo = 1;
+	i = 0;
+	while (i < game->number_of_philosophers)
+	{
+		ret = pthread_join(sing[i].philo_thr, NULL);
+		if (ret != 0)
+			return (free_staff(sing));
+		i++;
+	}
+	ret = pthread_join(game->watch_dog, NULL);
+	if (ret != 0)
+		return (free_staff(sing));
+	return (0);
+}
+
 int	load_game(t_pg *game)
 {
 	t_th	*sing;
@@ -94,22 +116,12 @@ int	load_game(t_pg *game)
 	{
 		ret = pthread_create(&sing[i].philo_thr, NULL, philo_run, &sing[i]);
 		if (ret != 0)
-			printf("STOP-------------------\n");
+			return (free_staff(sing));
 		i++;
 	}
 	ret = pthread_create(&game->watch_dog, NULL, &the_killer, sing);
-		if (ret != 0)
-			printf("STOP-------------------\n");
-	game->allphilo = 1;
-	i = 0;
-	// printf("here 4\n");
-	while (i < game->number_of_philosophers)
-	{
-		ret = pthread_join(sing[i].philo_thr, NULL);
-		if (ret != 0)
-			printf("STOP-------------------\n");
-		i++;
-	}
-		pthread_join(game->watch_dog, NULL); //later
+	if (ret != 0)
+		return (free_staff(sing));
+	norm_join(sing, game);
 	return (0);
 }

@@ -16,30 +16,25 @@ static void	status_print(t_pg *game, t_th *sing, int s_witch)
 	pthread_mutex_lock(&game->lock);
 	gettimeofday(&c_time, NULL);
 	sing->time_now = ((c_time.tv_usec / 1000) + (c_time.tv_sec * 1000)) - game->startime;
-	if (game->death_status > -1)
-	{
-		// crossroad(temp, sing->uniqid + 1, (int)sing->time_now);
+	if (game->death_status == 0)
 		printf("%ld %d %s\n", sing->time_now, sing->uniqid + 1, temp);
-
-	}
-
 	pthread_mutex_unlock(&game->lock);
 }
 
-static int	u_my_sleep(long tv_tosleep_msec, int interval)
+static int	u_my_sleep(long time_to, int for_time)
 {
 	struct timeval	c_time;
 	long			start;
 	long			now;
-	long			tosleep;
+	long			until;
 
 	gettimeofday(&c_time, NULL);
 	start = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000);
 	now = start;
-	tosleep = start + tv_tosleep_msec;
-	while (now < tosleep)
+	until = start + time_to;
+	while (now < until)
 	{
-		usleep(interval);
+		usleep(for_time);
 		gettimeofday(&c_time, NULL);
 		now = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000);
 	}
@@ -51,21 +46,14 @@ static void	feeding_sycle(t_pg *game, t_th *sing)
 	status_print(game, sing, EAT);
 	sing->was_eat = sing->time_now;
 	sing->count_meal++;
-	// if (sing->uniqid == 1)
-	if (sing->count_meal >= sing->game_link->pici)
-		return ;
-		printf("-----%d-----\n", sing->count_meal);
 	u_my_sleep(game->time_to_eat, game->for_timer);
 	if (sing->uniqid != game->number_of_philosophers)
 		pthread_mutex_unlock(&game->forks[sing->uniqid + 1]);
 	else
 		pthread_mutex_unlock(&game->forks[0]);
 	pthread_mutex_unlock(&game->forks[sing->uniqid]);
-	// if (sing->count_meal == game->number_of_times_each_philosopher_must_eat)
-	// {
-	// 	sing->stop = THINK;
-	// 	return ;
-	// }
+	if (sing->count_meal == sing->game_link->pici)
+		return ;
 	status_print(game, sing, SLEEP);
 	u_my_sleep(game->time_to_sleep, game->for_timer);
 	status_print(game, sing, THINK);
@@ -73,10 +61,6 @@ static void	feeding_sycle(t_pg *game, t_th *sing)
 
 static void	eat_think_sleep(t_pg *game, t_th *sing)
 {
-	// if (sing->stop == THINK)
-	// if (sing->left_fork == sing->right_fork)
-	// 	return ;
-
 	if (sing->uniqid != game->number_of_philosophers)
 		pthread_mutex_lock(&game->forks[sing->uniqid + 1]);
 	else
@@ -95,29 +79,17 @@ void *philo_run(void *arg)
 	sing = (t_th *)arg;
 	game = sing->game_link;
 	while (1)
-	{
 		if (game->allphilo)
 			break ;
-	}
 	if (sing->uniqid % 2 == 0)
 		u_my_sleep(game->time_to_eat - 1, game->for_timer);
-		// usleep(game->time_to_eat - 1);
-		int i = 100;
-	while (i)
+	while (1)
 	{
-		if (game->death_status < 0)
-		{
-			// status_print(game, sing, DIE);
+		if (game->death_status == -3)
 			break ;
-		}
-		if (sing->count_meal >= sing->game_link->pici && sing->game_link->pici > 0)
-		{
-			// status_print(game, sing, DIE);
+		else if (sing->count_meal == sing->game_link->pici)
 			break ;
-		}
 		eat_think_sleep(game, sing);
-		i--;
 	}
-
 	return (NULL);
 }

@@ -2,8 +2,12 @@ CC = gcc
 NAME = philo
 FLAGS = -Wall -Wextra -Werror
 SRC = 	ph*.c
+SRCC = 	ph_brain.c ph_long_atoi.c ph_run_game.c ph_utils.c philo.c 
+SRCO = 	ph_brain.o ph_long_atoi.o ph_run_game.o ph_utils.o philo.o 
 OBJ = $(SRC:.c=.o)
 
+PPP=-g -fsanitize=thread
+LLL=-g -fsanitize=address
 # COLORS
 Y = "\033[33m"
 P = "\033[93m"
@@ -24,8 +28,12 @@ all: $(NAME)
 	@echo $(P)"█▌     █  █▌ █▌  .▀▐█▐█▌ ▀█▄▀ "$(X)
 	@printf "\n\n"
 
-$(NAME): $(OBJ) philo.h
-	$(CC) $(FLAGS) $(OBJ) -o $(NAME)
+
+$(NAME):
+	$(CC) $(SRCC) -lpthread -c
+	$(CC) $(SRCO) -lpthread -o $(NAME).out 
+# $(NAME): $(OBJ) philo.h
+# 	$(CC) $(FLAGS) $(OBJ) -o $(NAME)
 
 clean:
 	rm -f *.o
@@ -35,6 +43,10 @@ fclean: clean
 
 re: fclean all
 
+fa:
+	$(CC) $(SRC) $(PPP) -o $(NAME).out
+val:
+	$(CC) $(SRCC) -o $(NAME).out 
 no:
 	$(CC) $(SRC) -o $(NAME).out
 	@printf "\n"

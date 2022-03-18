@@ -30,7 +30,6 @@ typedef struct s_philo_game
 	int				pici;
 	int				stopcount;
 	long			startime;
-	// int				actual;
 	int				death_status;
 	int				for_timer;
 	pthread_mutex_t	*forks;
@@ -45,16 +44,15 @@ typedef struct s_singleton
 	long		time_now;
 	long		was_eat;
 	int			count_meal;
-	// int			stop; // need this?
 	t_pg		*game_link;
 }	t_th;
 
 long	ft_long_atoi(const char *str);
 void	*philo_run(void *arg);
-int		crossroad(char *args, int number, int time);
 
 // new life
 
 int	load_game(t_pg *game);
+int free_staff(t_th *sing);
 
 #endif

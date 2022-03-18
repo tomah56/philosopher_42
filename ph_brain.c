@@ -1,9 +1,18 @@
 #include "philo.h"
+#include <pthread.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <sys/time.h>
+#include <limits.h>
+#include <stdlib.h>
 
 static int	killer_the_iii(t_th	*sing, long now, int i)
 {
 	sing[i].game_link->death_status = -3;
 	printf("%ld %d died\n", now, sing[i].uniqid + 1);
+	// usleep(2500);
+	sleep(1);
+	free_staff(sing);
 	return (1);
 }
 
@@ -13,22 +22,21 @@ static int	killer_the_ii(t_th	*sing, int stop, int time_to_die, int i)
 	struct timeval	c_time;
 	long			now;
 
-	ch_eck = 1;
+	ch_eck = 0;
 	while (i < stop)
 	{
 		gettimeofday(&c_time, NULL);
 		now = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000)
 			- sing[0].game_link->startime;
-		if (now - sing[i].was_eat >= time_to_die && sing->game_link->pici < 0)
-			// && sing[i].game_link->death_status != -5)
+		if (now - sing[i].was_eat >= time_to_die 
+			/* && sing[i].game_link->death_status != -5 */)
 			return (killer_the_iii(sing, now, i));
-		if (sing[i].count_meal >= sing[0].game_link->pici)
+		if (sing[i].count_meal == sing[0].game_link->pici)
 			ch_eck++;
 		i++;
 	}
 	if (ch_eck == stop)
 		return (1);
-		// sing[0].game_link->stopcount = -5;
 	return (0);
 }
 
@@ -45,7 +53,7 @@ static void	*the_killer(void *arg)
 	{
 		if (killer_the_ii(sing, stop, time_to_die, 0))
 			return (NULL);
-		usleep(500);
+		usleep(1024);
 	}
 	return (NULL);
 }
@@ -63,7 +71,6 @@ static int	load_values(t_th *sing, t_pg *game)
 		sing[j].time_now = 0;
 		sing[j].was_eat = 0;
 		sing[j].count_meal = 0;
-		// sing[j].stop = 0;
 		j++;
 	}
 	ret = pthread_mutex_init(&game->lock, NULL);
@@ -79,21 +86,30 @@ int	load_game(t_pg *game)
 	int		ret;
 
 	sing = malloc((game->number_of_philosophers) * sizeof(t_th));
+	if (sing == NULL)
+		return (0);
 	load_values(sing, game);
 	i = 0;
 	while (i < game->number_of_philosophers)
 	{
-		pthread_create(&sing[i].philo_thr, NULL, philo_run, &sing[i]);
+		ret = pthread_create(&sing[i].philo_thr, NULL, philo_run, &sing[i]);
+		if (ret != 0)
+			printf("STOP-------------------\n");
 		i++;
 	}
-	pthread_create(&game->watch_dog, NULL, &the_killer, sing);
+	ret = pthread_create(&game->watch_dog, NULL, &the_killer, sing);
+		if (ret != 0)
+			printf("STOP-------------------\n");
 	game->allphilo = 1;
 	i = 0;
+	// printf("here 4\n");
 	while (i < game->number_of_philosophers)
 	{
-		pthread_join(sing[i].philo_thr, NULL); //later
+		ret = pthread_join(sing[i].philo_thr, NULL);
+		if (ret != 0)
+			printf("STOP-------------------\n");
 		i++;
 	}
-	pthread_join(game->watch_dog, NULL); //later
+		pthread_join(game->watch_dog, NULL); //later
 	return (0);
 }

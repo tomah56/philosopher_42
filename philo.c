@@ -74,7 +74,6 @@ int	game_starter(t_pg *game)
 	game->startime = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000); // c_time.tv_usec;
 	game->number_of_times_each_philosopher_must_eat = -1;
 	game->pici = -2;
-	// game->actual = 0;
 	game->death_status = 0;
 	game->allphilo = 0;
 	game->for_timer = 128;
@@ -86,9 +85,6 @@ int	main(int argc, char **argv)
 {
 	int		check;
 	t_pg	game;
-	int 	i;
-	int 	j;
-	long zero;
 
 	if (argc == 5 || argc == 6)
 	{
@@ -96,6 +92,8 @@ int	main(int argc, char **argv)
 		check = chekker(argc, argv, &game, 1);
 		if (game.number_of_philosophers > 128)
 			game.for_timer = 512;
+		if (game.number_of_philosophers == 1)
+			return (write(1 ,"0 1 died\n", 9));
 		game.pici = game.number_of_times_each_philosopher_must_eat;
 		if (check != 0)
 			return (write(1 ,"Wrong input!\n", 13));
@@ -103,10 +101,7 @@ int	main(int argc, char **argv)
 		load_game(&game);
 	}
 	else
-	{
-		write(1 ,"Wrong input!\n", 13);
-		return (0);
-	}
+		return (write(1 ,"Wrong input!\n", 13));
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:32:23 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/18 19:54:46 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/18 22:47:08 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ typedef struct s_philo_game
 
 typedef struct s_singleton
 {
+	int			id;
 	int			uniqid;
 	long		time_now;
 	long		was_eat;
@@ -62,7 +63,7 @@ typedef struct s_singleton
 }	t_th;
 
 long	ft_long_atoi(const char *str);
-void	*philo_run(void *arg);
+int		philo_run(t_th	*sing);
 int		load_game(t_pg *game);
 int		free_staff(t_th *sing);
 

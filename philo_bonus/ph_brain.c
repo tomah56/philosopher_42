@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:32:05 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/18 22:36:49 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/20 03:00:42 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,12 +73,24 @@ static int	load_values(t_th *sing, t_pg *game)
 		sing[j].time_now = 0;
 		sing[j].was_eat = 0;
 		sing[j].count_meal = 0;
+		sing[j].id = 0;
 		j++;
 	}
 
 	return (0);
 }
 
+static int kill_them_all(t_th *sing)
+{
+	int j = 0;
+	while (j < sing->game_link->number_of_philosophers)
+	{
+		// printf("pid id: %d\n", sing[j].id);
+		kill(sing[j].id, 2);
+		j++;
+	}
+	return (0);
+}
 
 int	load_game(t_pg *game)
 {
@@ -90,22 +102,73 @@ int	load_game(t_pg *game)
 	if (sing == NULL)
 		return (0);
 	load_values(sing, game);
-	i = 0;
-	sem_unlink("\spoons");
-	sem_unlink("\print");
-	game->spoons = sem_open("\spoons", 0666, game->number_of_philosophers);
-	game->lock = sem_open("\print", 0666, 1);
+	sem_unlink("/spoons");
+	sem_unlink("/print");
+	game->spoons = sem_open("/spoons", O_CREAT | O_EXCL, S_IRWXU, game->number_of_philosophers);
+	game->lock = sem_open("/print", O_CREAT | O_EXCL, S_IRWXU, 1);
 
-	sem_wait(game->spoons);
-	sem_post(game->spoons);
+
+	// sem_wait(game->spoons);
+	// sem_post(game->spoons);
+	i = 0;
+	int j = 0;
 	while (i < game->number_of_philosophers)
 	{
-		ret = pthread_create(&sing[i].philo_thr, NULL, philo_run, &sing[i]);
-		if (ret != 0)
-			return (free_staff(sing));
+		// j == i;
+		// while (j != 0 && sing[j].id == 0)
+		// {
+		// 	j--;
+		// }
+		// if (i != 0 && sing[i - 1].id == 0 && sing[i].id == 0)
+			sing[i].id = fork();
+		if (sing[i].id == 0)
+		{
+
+			philo_run(&sing[i]);
+			return (0);
+
+		}
+		// printf("id: %d     i: %d\n", sing[i].id, i);
+		// return (0);
+		// waitpid(sing[i].id, NULL, 0);
 		i++;
 	}
-	game->allphilo = 1;
+	i = 0;
+	int rett = 0;
+	while (i < game->number_of_philosophers)
+	{
+
+		// printf("id: %d  i: %d\n", sing[i].id, i);
+		rett = waitpid(sing[i].id, NULL, 0);
+		kill_them_all(sing);
+		exit(EXIT_SUCCESS);
+		// int j = 0;
+
+
+		i++;
+	}
+	// if (rett)
+	// {
+
+	// 	while (j < game->number_of_philosophers)
+	// 	{
+	// 		kill(sing[j].id, 2);
+	// 		j++;
+	// 	}
+	// }
+	
+	// game->allphilo = 1;
 
 	return (0);
 }
+
+// sing[0].id = fork();
+// if (sing[0].id == 0)
+// {
+// 	philo_run(&sing[0]);
+// }
+// sing[1].id = fork();
+// if (sing[1].id == 0)
+// {
+// 	philo_run(&sing[1]);
+// }

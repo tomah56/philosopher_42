@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:32:34 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/20 02:40:38 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/21 15:55:50 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,42 +104,19 @@ static void	feeding_sycle(t_pg *game, t_th *sing)
 {
 	status_print(game, sing, EAT);
 	sing->was_eat = sing->time_now;
-	sing->count_meal++;
-	
-	// u_my_sleep(game->time_to_eat, game->for_timer);
-	dead_my_sleep(game->time_to_eat, game->for_timer, game, sing);
+	sing->count_meal++;	
+	u_my_sleep(game->time_to_eat, game->for_timer);
 	sem_post(game->spoons);
 	sem_post(game->spoons);
-	// if (sing->uniqid != game->number_of_philosophers - 1)
-	// 	pthread_mutex_unlock(&game->forks[sing->uniqid + 1]);
-	// else
-	// 	pthread_mutex_unlock(&game->forks[0]);
-	// pthread_mutex_unlock(&game->forks[sing->uniqid]);
 	if (sing->count_meal == sing->game_link->pici)
 		return ;
 	status_print(game, sing, SLEEP);
-	// u_my_sleep(game->time_to_sleep, game->for_timer);
-	dead_my_sleep(game->time_to_sleep, game->for_timer, game, sing);
+	u_my_sleep(game->time_to_sleep, game->for_timer);
 	status_print(game, sing, THINK);
 }
 
 static void	eat_think_sleep(t_pg *game, t_th *sing)
 {
-	// if (sing->uniqid != game->number_of_philosophers - 1)
-	// 	pthread_mutex_lock(&game->forks[sing->uniqid + 1]);
-	// else if (game->number_of_philosophers != 1)
-	// {
-	// 	pthread_mutex_lock(&game->forks[0]);
-	// }
-	// if (game->number_of_philosophers != 1)
-	// 	pthread_mutex_lock(&game->forks[sing->uniqid]);
-	// else
-	// {
-	// 	u_my_sleep(game->time_to_die, game->for_timer);
-	// 	return ;
-	// }
-	// if (sing->count_meal == sing->game_link->pici)
-	// 	return ;
 	sem_wait(game->spoons);
 	status_print(game, sing, TFORK);
 	sem_wait(game->spoons);
@@ -147,30 +124,67 @@ static void	eat_think_sleep(t_pg *game, t_th *sing)
 	feeding_sycle(game, sing);
 }
 
+static int	killer_the_ii(t_th	*sing, int stop, int time_to_die, int i)
+{
+	struct timeval	c_time;
+	long			now;
+
+	gettimeofday(&c_time, NULL);
+	now = (c_time.tv_usec / 1000) + (c_time.tv_sec * 1000)
+		- sing->game_link->startime;
+	if (now - sing->was_eat >= time_to_die)
+	{
+		sem_wait(sing->game_link->lock);
+		sing->game_link->death_status = -3;
+		printf("%ld %d died\n", now, sing->uniqid + 1);
+		exit(EXIT_SUCCESS);
+		return (1);
+	}
+	return (0);
+}
+
+static void	*the_killer(void *arg)
+{
+	t_th	*sing;
+	int		stop;
+	int		time_to_die;
+
+	sing = arg;
+	stop = sing->game_link->number_of_philosophers;
+	time_to_die = sing->game_link->time_to_die;
+	while (1)
+	{
+		if (killer_the_ii(sing, stop, time_to_die, 0))
+		{
+			return (NULL);
+		}
+		usleep(512);
+	}
+	return (NULL);
+}
+
+
 int	philo_run(t_th	*sing)
 {
 	t_pg	*game;
+	int		ret;
 
 	game = sing->game_link;
-	// write(1, "HELLO\n", 6);
-	// while (1)
-	// {
-	// 	if (game->allphilo)
-	// 		break ;
-	// }
-	// write(1, "HE__O\n", 6);
-	// if (sing->uniqid % 2 == 0)
-	// 	u_my_sleep(game->time_to_eat - 1, game->for_timer);
-	// sleep(60);
+		ret = pthread_create(&sing->watch_dog, NULL, &the_killer, sing);
+	if (ret != 0)
+		return (free_staff(sing));
 	while (1)
 	{
-		// printf("---%d ------ %d--------- pid: %d  id:%d\n", sing->count_meal, sing->uniqid, getpid(), sing->id);
 		if (game->death_status == -3)
+		{
 			return (0);
+		}
 		else if (sing->count_meal == sing->game_link->pici)
 			return (0);
 		else
 			eat_think_sleep(game, sing);
 	}
+	ret = pthread_join(sing->watch_dog, NULL);
+	// if (ret !ma(free_staff(sing));
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:32:23 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/18 22:47:08 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/20 19:26:02 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <sys/time.h>
 # include <limits.h>
 # include <stdlib.h>
+# include <pthread.h>
 
 # include <semaphore.h>
 # include <signal.h>
@@ -59,6 +60,7 @@ typedef struct s_singleton
 	long		time_now;
 	long		was_eat;
 	int			count_meal;
+	pthread_t	watch_dog;
 	t_pg		*game_link;
 }	t_th;
 

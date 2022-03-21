@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:32:44 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/18 17:43:18 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/21 15:52:57 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,18 +82,19 @@ static int	game_starter(t_pg *game)
 int	main(int argc, char **argv)
 {
 	int		check;
-	t_pg	game;
+	t_pg	*game;
 
 	if (argc == 5 || argc == 6)
-	{
-		game_starter(&game);
-		check = chekker(argc, argv, &game, 1);
-		if (game.number_of_philosophers > 128)
-			game.for_timer = 512;
-		game.pici = game.number_of_times_each_philosopher_must_eat;
+	{	
+		game = malloc(sizeof(t_pg));
+		game_starter(game);
+		check = chekker(argc, argv, game, 1);
+		if (game->number_of_philosophers > 128)
+			game->for_timer = 612;
+		game->pici = game->number_of_times_each_philosopher_must_eat;
 		if (check != 0)
 			return (write(1, "Wrong input!\n", 13));
-		load_game(&game);
+		load_game(game);
 	}
 	else
 		return (write(1, "Wrong input!\n", 13));

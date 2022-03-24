@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:32:23 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/20 19:26:02 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/22 10:49:22 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ typedef struct s_philo_game
 	int				death_status;
 	sem_t			*spoons;
 	sem_t			*lock;
+	sem_t			*was;
 	int				for_timer;
 }	t_pg;
 
@@ -68,5 +69,7 @@ long	ft_long_atoi(const char *str);
 int		philo_run(t_th	*sing);
 int		load_game(t_pg *game);
 int		free_staff(t_th *sing);
+void	*the_killer(void *arg);
+void	u_my_sleep(long time_to, int for_time);
 
 #endif

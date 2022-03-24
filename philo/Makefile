@@ -2,8 +2,8 @@ CC = gcc
 NAME = philo
 FLAGS = -Wall -Wextra -Werror
 SRC = 	ph*.c
-SRCC = 	ph_brain.c ph_long_atoi.c ph_run_game.c ph_utils.c philo.c 
-OBJO = 	ph_brain.o ph_long_atoi.o ph_run_game.o ph_utils.o philo.o 
+SRCC = 	ph_brain.c ph_long_atoi.c ph_run_game.c ph_utils.c ph_philo.c 
+OBJO = 	ph_brain.o ph_long_atoi.o ph_run_game.o ph_utils.o ph_philo.o 
 OBJ = $(SRCC:.c=.o)
 
 PPP=-g -fsanitize=thread
@@ -41,11 +41,11 @@ fclean: clean
 re: fclean all
 
 fa:
-	$(CC) $(SRC) $(PPP) -o $(NAME).out
+	$(CC) $(SRC) $(PPP) -o $(NAME)
 val:
-	$(CC) $(SRCC) -o $(NAME).out 
+	$(CC) $(SRCC) -lpthread -o $(NAME)
 no:
-	$(CC) $(SRC) -o $(NAME).out
+	$(CC) $(SRC) -o $(NAME)
 	@printf "\n"
 	@echo $(P)"████▄  ▄           ▄▄         "$(X)
 	@echo $(P)"█   █• █.          ██         "$(X)

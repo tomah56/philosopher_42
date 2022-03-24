@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:32:23 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/18 13:47:51 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/24 16:58:36 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,5 +62,6 @@ long	ft_long_atoi(const char *str);
 void	*philo_run(void *arg);
 int		load_game(t_pg *game);
 int		free_staff(t_th *sing);
+void	u_my_sleep(long time_to, int for_time);
 
 #endif

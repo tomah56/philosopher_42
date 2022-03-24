@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:32:34 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/18 14:07:01 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/22 14:16:02 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static void	status_print(t_pg *game, t_th *sing, int s_witch)
 	pthread_mutex_unlock(&game->lock);
 }
 
-static void	u_my_sleep(long time_to, int for_time)
+void	u_my_sleep(long time_to, int for_time)
 {
 	struct timeval	c_time;
 	long			start;

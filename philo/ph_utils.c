@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:31:49 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/18 13:32:00 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/24 16:36:10 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ int	free_staff(t_th *sing)
 	}
 	pthread_mutex_destroy(&sing->game_link->lock);
 	free(sing->game_link->forks);
-	usleep(1000);
 	free(sing);
 	return (0);
 }

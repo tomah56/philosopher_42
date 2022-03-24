@@ -17,8 +17,8 @@ startime proc: 1647873566128 philo nrm:5
 (printed form killer thred)
 	starttime: 0 time to die: 8 getpid: 76191
 	1647873566329 2 died
-			{sem_wait should stop any printing after this protnong statment, 
-			also there isan exit there should quit the program}
+			{sem_wait should stop any printing after this printing, 
+			also there is an exit there should quit the program, its like a ghost process}
 201 5 has taken a fork
 201 3 is eating
 201 4 has taken a fork

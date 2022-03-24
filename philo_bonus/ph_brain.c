@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:32:05 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/21 15:43:40 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/22 13:35:24 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 static int	load_values(t_th *sing, t_pg *game)
 {
 	int	j;
-	int	ret;
 
 	j = 0;
 	while (j < game->number_of_philosophers)
@@ -28,18 +27,23 @@ static int	load_values(t_th *sing, t_pg *game)
 		sing[j].id = 0;
 		j++;
 	}
-
 	return (0);
 }
 
-static int kill_them_all(t_th *sing)
+static int	kill_them_all(t_th *sing)
 {
-	int j = 0;
+	int	j;
+
+	j = 0;
+	waitpid(0, NULL, 0);
+	u_my_sleep(sing[0].game_link->time_to_die * 1.1, 200);
 	while (j < sing->game_link->number_of_philosophers)
 	{
 		kill(sing[j].id, 2);
 		j++;
 	}
+	free_staff(sing);
+	exit(EXIT_SUCCESS);
 	return (0);
 }
 
@@ -47,7 +51,6 @@ int	load_game(t_pg *game)
 {
 	t_th	*sing;
 	int		i;
-	int		ret;
 
 	sing = malloc((game->number_of_philosophers) * sizeof(t_th));
 	if (sing == NULL)
@@ -55,7 +58,8 @@ int	load_game(t_pg *game)
 	load_values(sing, game);
 	sem_unlink("/spoons");
 	sem_unlink("/print");
-	game->spoons = sem_open("/spoons", O_CREAT | O_EXCL, S_IRWXU, game->number_of_philosophers);
+	game->spoons = sem_open("/spoons", O_CREAT | O_EXCL, S_IRWXU,
+			game->number_of_philosophers);
 	game->lock = sem_open("/print", O_CREAT | O_EXCL, S_IRWXU, 1);
 	i = 0;
 	while (i < game->number_of_philosophers)
@@ -68,8 +72,6 @@ int	load_game(t_pg *game)
 		}
 		i++;
 	}
-		waitpid(0, NULL, 0);
-		kill_them_all(sing);
-		exit(EXIT_SUCCESS);
+	kill_them_all(sing);
 	return (0);
 }

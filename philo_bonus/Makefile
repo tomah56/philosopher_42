@@ -21,11 +21,11 @@ CUT = "\033[K"
 # all: $(NAME)
 all: $(NAME)
 	@printf "\n"
-	@echo $(P)"▄▄▄▄   ▄           ▄▄             ▄      "$(X)
-	@echo $(P)"█   █• █           ██             █      "$(X)
+	@echo $(X)"▄▄▄▄   ▄           ▄▄             ▄      "$(X)
+	@echo $(B)"█   █• █           ██             █      "$(X)
 	@echo $(P)"████▪  █      ▀    ██    ▄█▀▄     ██▀▄   "$(X)
-	@echo $(P)"█▌     █▀▀█▌ ▐█   ▐█▌    █▌.▐     █▌. ▐   "$(X)
-	@echo $(P)"█▌     █  █▌ █▌  .▀▐█▐█▌ ▀█▄▀ ▀   ▐█▄▀  ▀ "$(X)
+	@echo $(G)"█▌     █▀▀█▌ ▐█   ▐█▌    █▌.▐     █▌. ▐   "$(X)
+	@echo $(R)"█▌     █  █▌ █▌  .▀▐█▐█▌ ▀█▄▀ ▀   ▐█▄▀  ▀ "$(X)
 	@printf "\n\n"
 
 $(NAME): $(OBJO) philo.h
@@ -41,11 +41,11 @@ fclean: clean
 re: fclean all
 
 fa:
-	$(CC) $(SRC) $(PPP) -o $(NAME).out
+	$(CC) $(SRC) $(PPP) -o $(NAME)
 val:
-	$(CC) $(SRCC) -o $(NAME).out 
+	$(CC) $(SRCC) -lpthread -o $(NAME)
 no:
-	$(CC) $(SRC) -o $(NAME).out
+	$(CC) $(SRC) -o $(NAME)
 	@printf "\n"
 	@echo $(P)"████▄  ▄           ▄▄         "$(X)
 	@echo $(P)"█   █• █.          ██         "$(X)

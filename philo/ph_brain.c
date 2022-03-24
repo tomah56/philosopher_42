@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:32:05 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/18 14:04:52 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/24 16:36:01 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,11 +51,8 @@ static void	*the_killer(void *arg)
 	while (1)
 	{
 		if (killer_the_ii(sing, stop, time_to_die, 0))
-		{
-			free_staff(sing);
 			return (NULL);
-		}
-		usleep(512);
+		usleep(516);
 	}
 	return (NULL);
 }
@@ -123,5 +120,6 @@ int	load_game(t_pg *game)
 	if (ret != 0)
 		return (free_staff(sing));
 	norm_join(sing, game);
+	free_staff(sing);
 	return (0);
 }

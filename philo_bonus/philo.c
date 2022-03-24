@@ -6,7 +6,7 @@
 /*   By: ttokesi <ttokesi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/18 13:32:44 by ttokesi           #+#    #+#             */
-/*   Updated: 2022/03/21 15:52:57 by ttokesi          ###   ########.fr       */
+/*   Updated: 2022/03/22 11:49:44 by ttokesi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,3 @@ int	main(int argc, char **argv)
 		return (write(1, "Wrong input!\n", 13));
 	return (0);
 }
-
-//  system("leaks push_swap");
-//   	fscanf(stdin, "c");
-// getchar();
